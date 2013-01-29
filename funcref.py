@@ -1,12 +1,7 @@
 import os
 import sys
 import re
-
-html_file_path = sys.argv[1]
-func_name = sys.argv[2]
-
-#html_file_path = r"D:\work\kedou\src\main\webapp\back\card\cardApply\list_cardApply_back.html"
-#func_name = "showAdd"
+from optparse import OptionParser 
 
 pat = re.compile("""<script type="text/javascript" src="(?P<src>.*)"></script>""")
 
@@ -36,4 +31,20 @@ def search_ref(html_file_path, func_name):
 
 
 if __name__ == "__main__" :
+    description = " find out where did the javascrifpt function was defined "
+    usage="usage: funcref html_file js_func_name"
+    parser = OptionParser(description = description, usage = usage)
+    parser.add_option("--desc",action="store_true", dest="desc", default=False)
+
+    (options, args) = parser.parse_args()
+    if options.desc :
+        print parser.get_description()
+        sys.exit(0)
+
+    if len(args) < 2 :
+        parser.print_help()
+        sys.exit(0)
+
+    html_file_path = args[0]
+    func_name = args[1]
     search_ref(html_file_path, func_name)

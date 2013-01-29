@@ -1,30 +1,33 @@
 import memcache
 import sys
-import argparse
+from optparse import OptionParser 
 
-parser = argparse.ArgumentParser(description='mcache tool')
 
-parser.add_argument('--host', action="store", 
-        dest="host", default="127.0.0.1")
+description = "memcached client utilty"
+usage="usage: mcache {get|del|set} arguments "
+parser = OptionParser(description = description, usage = usage)
+parser.add_option("--desc",action="store_true", dest="desc", default=False)
+parser.add_option('--host', action="store", dest="host", default="127.0.0.1")
+parser.add_option('-p','--port', action="store", dest="port", default="11211" )
 
-parser.add_argument('-p','--port', action="store", 
-        dest="port", default="11211" )
-parser.add_argument('cmds', nargs='+', default='d')
+(options, args) = parser.parse_args()
+if options.desc :
+    print parser.get_description()
+    sys.exit(0)
 
 args_info = parser.parse_args()
-conn_str = "%s:%s" % (args_info.host , args_info.port)
+conn_str = "%s:%s" % (options.host , options.port)
 mc = memcache.Client([conn_str], debug=0)
-cmds = args_info.cmds
 
-if cmds[0] == "get" :
-    value = mc.get(cmds[1])
+if args[0] == "get" :
+    value = mc.get(args[1])
     print value
-elif cmds[0] == "del":
-    value = mc.delete(cmds[1])
-    print "delete %s from cache ok." % cmds[1]
-elif cmds[0] == "set":
-    mc.set(cmds[1], cmds[2])
-    print "set %s into cache ok." % cmds[1]
+elif args[0] == "del":
+    value = mc.delete(args[1])
+    print "delete %s from cache ok." % args[1]
+elif args[0] == "set":
+    mc.set(args[1], args[2])
+    print "set %s into cache ok." % args[1]
 
 
 

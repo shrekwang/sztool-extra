@@ -3,6 +3,7 @@ import os.path
 import os
 from subprocess import Popen
 from xml.etree.ElementTree import *
+from optparse import OptionParser 
 
 M2_REPO="d:/repo"
 WORK_HOME="d:/work"
@@ -31,11 +32,17 @@ def getProjectClassPath():
 
 if __name__ == "__main__" :
 
-    if len(sys.argv) != 2 :
-        print "Usage: ngserver {start|stop}\n"
-        sys.exit()
+    description = " start or stop ngserver"
+    usage="usage: ngserver {start|stop} "
+    parser = OptionParser(description = description, usage = usage)
+    parser.add_option("--desc",action="store_true", dest="desc", default=False)
 
-    opt = sys.argv[1]
+    (options, args) = parser.parse_args()
+    if options.desc :
+        print parser.get_description()
+        sys.exit(0)
+
+    opt = args[0]
     if opt == "start" :
         projectClassPath = getProjectClassPath()
         if projectClassPath == None :

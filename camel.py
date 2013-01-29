@@ -1,23 +1,23 @@
 import os
 import sys
 import re
+from optparse import OptionParser 
 
-src_str = sys.argv[1]
 
-def search_ref(src_str):
+def convert_camel(values):
     result = []
-    src_len = len(src_str)
+    src_len = len(values)
     i = 0
     while True :
         if i >= src_len :
             break
-        char = src_str[i]
+        char = values[i]
         if char >= 'A' and char <= 'Z' :
             result.append("_")
             result.append(char.lower())
         elif char == "_" and i < src_len-1:
             i = i + 1
-            char = src_str[i]
+            char = values[i]
             result.append(char.upper())
         else :
             result.append(char)
@@ -27,4 +27,19 @@ def search_ref(src_str):
 
 
 if __name__ == "__main__" :
-    print search_ref(src_str)
+    description = "  convert camelcase string to '_' splited string and vice verse"
+    usage="usage: camel value [values..]"
+    parser = OptionParser(description = description, usage = usage)
+    parser.add_option("--desc",action="store_true", dest="desc", default=False)
+
+    (options, args) = parser.parse_args()
+    if options.desc :
+        print parser.get_description()
+        sys.exit(0)
+
+    values = " ".join(args)
+    if len(args) < 1: 
+        parser.print_help()
+        sys.exit(0)
+    
+    print convert_camel(values)
