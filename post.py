@@ -7,6 +7,7 @@ import xml.dom.minidom
 import re
 import hashlib
 import datetime
+import uuid
 
 def loadData(data_path):
     if not os.path.exists(data_path):
@@ -30,6 +31,9 @@ def handleValue(data_map):
 def get_now_str():
     return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
+def get_uuid_str():
+    return str(uuid.uuid4())
+
 def get_md5_str(value):
     return hashlib.md5(value).hexdigest() 
 
@@ -43,6 +47,11 @@ def convert_exp(data_map, v):
         v = get_md5_str(param)
     elif v.startswith("date("):
         v = get_now_str()
+    elif v.startswith("uuid("):
+        v = get_uuid_str()
+    elif v.startswith("orderno("):
+        param = v.strip()[8:-1]
+        v =  param + "_"+ get_uuid_str()
     else :
         pat = re.compile('\$[a-zA-Z_.0-9]+')
         varnames  = pat.findall(v)
