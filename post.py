@@ -41,24 +41,31 @@ def pretty_xml(value):
     xml_obj = xml.dom.minidom.parseString(value) 
     return xml_obj.toprettyxml()
 
-def convert_exp(data_map, v):
+def convert_exp(data_map, v, v_name = None ):
     if v.startswith("md5("):
         param = convert_exp(data_map, v.strip()[4:-1])
         v = get_md5_str(param)
     elif v.startswith("date("):
         v = get_now_str()
+        if v_name != None:
+            data_map[v_name] = v
     elif v.startswith("uuid("):
         v = get_uuid_str()
+        if v_name != None:
+            data_map[v_name] = v
     elif v.startswith("orderno("):
         param = v.strip()[8:-1]
         v =  param + "_"+ get_uuid_str()
+        if v_name != None:
+            data_map[v_name] = v
     else :
         pat = re.compile('\$[a-zA-Z_.0-9]+')
         varnames  = pat.findall(v)
         if varnames != None :
             for item in varnames :
-                if data_map.get(item[1:]) != None :
-                    v = v.replace(item, convert_exp(data_map,data_map.get(item[1:])))
+                v_name = item[1:]
+                if data_map.get(v_name) != None :
+                    v = v.replace(item, convert_exp(data_map,data_map.get(v_name), v_name))
     return v
     
 
@@ -79,7 +86,7 @@ if __name__ == "__main__" :
 
     post_data = loadData(options.datafile)
     for item in post_data :
-        value = convert_exp(post_data,post_data[item])
+        value = convert_exp(post_data,post_data[item],item)
         post_data[item] = value
     if post_data.get("md5") != None:
         post_data.pop("md5")
