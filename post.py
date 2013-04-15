@@ -1,9 +1,9 @@
 from optparse import OptionParser 
+from BeautifulSoup import BeautifulSoup
 import urllib
 import urllib2
 import os
 import sys
-import xml.dom.minidom
 import re
 import hashlib
 import datetime
@@ -38,8 +38,8 @@ def get_md5_str(value):
     return hashlib.md5(value).hexdigest() 
 
 def pretty_xml(value):
-    xml_obj = xml.dom.minidom.parseString(value) 
-    return xml_obj.toprettyxml()
+    soup=BeautifulSoup(value)  
+    return soup.prettify()
 
 def convert_exp(data_map, v, v_name = None ):
     if v.startswith("md5("):
@@ -104,4 +104,10 @@ if __name__ == "__main__" :
 
     if options.format_to_xml :
         page = pretty_xml(page)
+    try :
+        page = page.decode("utf-8")
+        page = page.encode(sys.getdefaultencoding(), "ignore")
+    except Exception ,e:
+        print e
+        pass
     print page
