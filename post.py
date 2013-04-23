@@ -12,7 +12,7 @@ import uuid
 def loadData(data_path):
     if not os.path.exists(data_path):
         print "file not exits."
-        return None
+        return {}
     lines = open(data_path,"r").readlines()
     data_map = {}
     for line in lines:
@@ -84,19 +84,21 @@ if __name__ == "__main__" :
         print parser.get_description()
         sys.exit(0)
 
-    post_data = loadData(options.datafile)
-    for item in post_data :
-        value = convert_exp(post_data,post_data[item],item)
-        post_data[item] = value
-    if post_data.get("md5") != None:
-        post_data.pop("md5")
+    post_data = {}
+    if options.datafile != None :
+        post_data = loadData(options.datafile)
+        for item in post_data :
+            value = convert_exp(post_data,post_data[item],item)
+            post_data[item] = value
+        if post_data.get("md5") != None:
+            post_data.pop("md5")
 
-    if post_data == None :
-        sys.exit(0)
+        if post_data == None :
+            sys.exit(0)
 
-    if options.print_data :
-        print post_data
-        sys.exit(0)
+        if options.print_data :
+            print post_data
+            sys.exit(0)
 
 
     post_data = urllib.urlencode(post_data)
