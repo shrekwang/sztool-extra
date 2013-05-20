@@ -75,6 +75,7 @@ if __name__ == "__main__" :
     parser = OptionParser(description = description, usage = usage)
     parser.add_option("--desc",action="store_true", dest="desc", default=False)
     parser.add_option('-u','--url', action="store", dest="url")
+    parser.add_option('-c','--cookie', action="store", dest="cookie")
     parser.add_option('-d','--datafile', action="store", dest="datafile")
     parser.add_option('-f','--format-to-xml', action="store_true", dest="format_to_xml")
     parser.add_option('-p','--print-form-data', action="store_true", dest="print_data")
@@ -100,14 +101,25 @@ if __name__ == "__main__" :
             print post_data
             sys.exit(0)
 
-
     post_data = urllib.urlencode(post_data)
-    page=urllib2.urlopen(options.url, post_data).read().decode("utf-8")
+    opener = urllib2.build_opener()
+    if options.cookie != None :
+        opener.addheaders.append(('Cookie', options.cookie));
+    response = opener.open(options.url, post_data)
+    content_encoding = "utf-8"
+    content_type = response.info().getheader('Content-Type')
+    if content_type.strip() :
+        content_encoding = content_type[content_type.find("charset")+8:]
+        print "encoding is " + content_encoding
+    page = response.read().decode(content_encoding)
 
+    #squeeze empty space
+    page = os.linesep.join([s for s in page.splitlines() if s.strip()])
+    
     if options.format_to_xml :
         page = pretty_xml(page)
     try :
-        page = page.decode("utf-8")
+        #page = page.decode("utf-8")
         page = page.encode(sys.getdefaultencoding(), "ignore")
     except Exception ,e:
         print e
