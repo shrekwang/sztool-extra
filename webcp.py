@@ -68,6 +68,16 @@ if __name__ == "__main__" :
     projectClassPath = getProjectWebClassPath()
     if projectClassPath == None :
         projectClassPath =[]
-    for item in projectClassPath :
-        print item
     
+    webclasspath_file = open("src/main/webapp/.#webclasspath","w")
+    for item in projectClassPath :
+        webclasspath_file.write(item+"\n")
+    webclasspath_file.close()
+
+    print ".#webclasspath file generated. \n"
+    print "config project in tomcat server.xml like :\n"
+    print '    <Host name="virt.domain.com" appBase="webapps" unpackWARs="true" autoDeploy="true" xmlValidation="false" xmlNamespaceAware="false" />\n' 
+    print 'config project in tomcat ${Tomcat_Base}\conf\Catalina\hector.kedou.com\ROOT.xml like:\n\n' \
+          +'    <Context path="ROOT" reloadable="false" docBase="D:\work\demoapp\src\main\webapp" workDir="D:\work\demoapp\work" >\n'  \
+          +'      <Loader className="org.apache.catalina.loader.DevLoader" reloadable="true" debug="1" useSystemClassLoaderAsParent="false" />\n' \
+          +'    </Context>\n' \
