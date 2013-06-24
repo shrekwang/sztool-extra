@@ -111,7 +111,7 @@ if __name__ == "__main__" :
     if content_type.strip() :
         content_encoding = content_type[content_type.find("charset")+8:]
         print "encoding is " + content_encoding
-    page = response.read().decode(content_encoding)
+    page = response.read().decode(content_encoding,"replace")
 
     #squeeze empty space
     page = os.linesep.join([s for s in page.splitlines() if s.strip()])
