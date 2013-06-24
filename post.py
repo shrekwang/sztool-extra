@@ -41,10 +41,24 @@ def pretty_xml(value):
     soup=BeautifulSoup(value)  
     return soup.prettify()
 
-def convert_exp(data_map, v, v_name = None ):
+def convert_exp(data_map, v, v_name = None, options = None ):
+
     if v.startswith("md5("):
-        param = convert_exp(data_map, v.strip()[4:-1])
+        param = convert_exp(data_map, v.strip()[4:-1],options)
         v = get_md5_str(param)
+
+    elif v.startswith("upper("):
+        param = convert_exp(data_map, v.strip()[6:-1],options)
+        v = param.upper()
+
+    elif v.startswith("lower("):
+        param = convert_exp(data_map, v.strip()[6:-1],options)
+        v = param.lower()
+
+    elif v.startswith("urlencode("):
+        param = convert_exp(data_map, v.strip()[10:-1],options)
+        v= urllib.urlencode({"v":param})[2:]
+
     elif v.startswith("date("):
         v = get_now_str()
         if v_name != None:
@@ -65,7 +79,7 @@ def convert_exp(data_map, v, v_name = None ):
             for item in varnames :
                 v_name = item[1:]
                 if data_map.get(v_name) != None :
-                    v = v.replace(item, convert_exp(data_map,data_map.get(v_name), v_name))
+                    v = v.replace(item, convert_exp(data_map,data_map.get(v_name), v_name,options))
     return v
     
 
@@ -79,6 +93,8 @@ if __name__ == "__main__" :
     parser.add_option('-d','--datafile', action="store", dest="datafile")
     parser.add_option('-f','--format-to-xml', action="store_true", dest="format_to_xml")
     parser.add_option('-p','--print-form-data', action="store_true", dest="print_data")
+    parser.add_option('-g','--debug', action="store_true", dest="debug")
+
     (options, args) = parser.parse_args()
 
     if options.desc :
@@ -89,7 +105,7 @@ if __name__ == "__main__" :
     if options.datafile != None :
         post_data = loadData(options.datafile)
         for item in post_data :
-            value = convert_exp(post_data,post_data[item],item)
+            value = convert_exp(post_data,post_data[item],item, options)
             post_data[item] = value
         if post_data.get("md5") != None:
             post_data.pop("md5")
@@ -101,6 +117,9 @@ if __name__ == "__main__" :
             print post_data
             sys.exit(0)
 
+    if options.debug :
+        print post_data
+
     post_data = urllib.urlencode(post_data)
     opener = urllib2.build_opener()
     if options.cookie != None :
@@ -110,7 +129,10 @@ if __name__ == "__main__" :
     content_type = response.info().getheader('Content-Type')
     if content_type.strip() :
         content_encoding = content_type[content_type.find("charset")+8:]
+
+    if options.debug :
         print "encoding is " + content_encoding
+
     page = response.read().decode(content_encoding,"replace")
 
     #squeeze empty space
@@ -124,4 +146,5 @@ if __name__ == "__main__" :
     except Exception ,e:
         print e
         pass
+
     print page
