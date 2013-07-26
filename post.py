@@ -128,7 +128,8 @@ if __name__ == "__main__" :
     content_encoding = "utf-8"
     content_type = response.info().getheader('Content-Type')
     if content_type.strip() :
-        content_encoding = content_type[content_type.find("charset")+8:]
+        if content_type.find("charset") > -1 :
+            content_encoding = content_type[content_type.find("charset")+8:]
 
     if options.debug :
         print "encoding is " + content_encoding
