@@ -3,9 +3,11 @@ import sys
 import re
 from optparse import OptionParser 
 
-pat = re.compile("""<script type="text/javascript" src="(?P<src>.*)"></script>""")
+pat = re.compile("""<script(.*)src="(?P<src>.*\.js).*"></script>""")
 
-def search_ref(html_file_path, func_name):
+appServerPat = re.compile(r"\$\{appServer\s*\}")
+
+def search_ref(html_file_path, func_name, web_root):
     if not os.path.exists(html_file_path) :
         print "html file not exits."
         return
@@ -17,7 +19,10 @@ def search_ref(html_file_path, func_name):
         result = pat.search(line)
         if result != None :
             src = result.group("src")
-            src = os.path.normpath(os.path.join(dirname, src))
+            if appServerPat.search(src) :
+                src = os.path.normpath(appServerPat.sub(web_root,src))
+            else :
+                src = os.path.normpath(os.path.join(dirname, src))
             if os.path.exists(src):
                 content = open(src).readlines()
                 matched_lines = {}
@@ -29,6 +34,13 @@ def search_ref(html_file_path, func_name):
                     for rownum in matched_lines :
                         print "     " + str(rownum) + ":" + matched_lines[rownum]
 
+def get_web_root(path):
+    path=os.path.normpath(os.path.abspath(path))
+    mvn_web_root = os.path.join(os.path.join("src","main"),"webapp")
+    t_idx = path.find(mvn_web_root)
+    if t_idx >= 0 :
+        return os.path.join(path[0:t_idx] + mvn_web_root)
+    return path
 
 if __name__ == "__main__" :
     description = " find out where did the javascrifpt function was defined "
@@ -47,4 +59,6 @@ if __name__ == "__main__" :
 
     html_file_path = args[0]
     func_name = args[1]
-    search_ref(html_file_path, func_name)
+
+    web_root = get_web_root(html_file_path)
+    search_ref(html_file_path, func_name,web_root)

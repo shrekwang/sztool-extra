@@ -10,7 +10,7 @@ M2_REPO="D:/repo"
 
 def getProjectCfg():
     user_home = os.path.expanduser('~')
-    project_cfg_path = os.path.join(user_home,".sztools/project.cfg")
+    project_cfg_path = os.path.join(user_home,".vinja/project.cfg")
     if not os.path.exists(project_cfg_path):
         return
     lines = open(project_cfg_path,"r").readlines()

@@ -114,7 +114,8 @@ if __name__ == "__main__" :
             sys.exit(0)
 
         if options.print_data :
-            print post_data
+            for name in post_data :
+                print "%s=%s" % (name, post_data[name])
             sys.exit(0)
 
     if options.debug :

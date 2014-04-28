@@ -1,4 +1,4 @@
-sztool-extra
+vinja-extra
 ============
 
-extra python scripts for vim-sztool project
+extra python scripts for vinja project
